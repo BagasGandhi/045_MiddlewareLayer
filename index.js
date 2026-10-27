@@ -126,7 +126,11 @@ function validateParams(schema) {
 //METHOD GET
 
 app.get('/', async (req, res) => {
-    const resutl = await pool.query
+    const result = await pool.query(
+        'SELECT * FROM biodata ORDER BY id'
+    )
+    
+    return successResponse(res, 'Data berhasil diambil', result.rows)
 })  
 
 //METHOD POST
@@ -222,4 +226,23 @@ app.use((req, res) => {
         'endpoint tidak ditemukan',
         404
     )
+})
+
+//GLOBAL ERROR HANDLER
+app.use((err, req, res, next) => {
+    console.error(err)
+
+    if (res.headersSent) {
+        return next(err)
+    }
+
+    return errorResponse(
+        res,
+        'Terjadi kesalahan pada server',
+        500
+    )
+})
+
+app.listen(port, () => {
+    console.log(`App running on port ${port}.`)
 })
